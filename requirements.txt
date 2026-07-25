@@ -3,3 +3,5 @@ uvicorn
 fastapi
 pydantic
 uvicorn
+Pillow
+imagehash
