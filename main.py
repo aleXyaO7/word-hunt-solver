@@ -16,9 +16,16 @@ app = FastAPI()
 async def health_check():
     return {"status": "ok"}
 
-# EasyOCR reader, created once at startup (loading the model takes a few
-# seconds -- this happens when the server boots, not per-request).
-OCR_READER = easyocr.Reader(["en"], gpu=False)
+# EasyOCR reader, loaded lazily on first use so uvicorn can start and pass
+# the health check before the model finishes downloading.
+_ocr_reader = None
+
+
+def get_ocr_reader():
+    global _ocr_reader
+    if _ocr_reader is None:
+        _ocr_reader = easyocr.Reader(["en"], gpu=False)
+    return _ocr_reader
 
 
 # ---------- Trie setup ----------
@@ -150,7 +157,7 @@ def read_letter_from_image(img: Image.Image) -> tuple[str, float]:
     padded = ImageOps.expand(img, border=20, fill="white")
     np_img = np.array(padded.convert("RGB"))
 
-    results = OCR_READER.readtext(
+    results = get_ocr_reader().readtext(
         np_img,
         allowlist=ALLOWED_LETTERS,
         detail=1,
