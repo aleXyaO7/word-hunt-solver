@@ -11,6 +11,11 @@ from pydantic import BaseModel
 
 app = FastAPI()
 
+
+@app.get("/")
+async def health_check():
+    return {"status": "ok"}
+
 # EasyOCR reader, created once at startup (loading the model takes a few
 # seconds -- this happens when the server boots, not per-request).
 OCR_READER = easyocr.Reader(["en"], gpu=False)
@@ -296,6 +301,7 @@ class PlayResponse(BaseModel):
     letters: str
     words: List[str]
     count: int
+    max_score: int
     per_cell_confidence: List[float]
     status: str = "ok"
 
@@ -313,9 +319,12 @@ async def play(request: Request):
     letters = "\n".join([grid_result.letters[i * 4 : i * 4 + 4] for i in range(4)])
     print(f"[play] letters:\n{letters}")
 
+    max_score = sum([(len(word) - 3) * 400 + 100 for word in solved.words])
+
     return PlayResponse(
         letters=letters,
         words=solved.words[:15],
         count=solved.count,
+        max_score=max_score,
         per_cell_confidence=grid_result.per_cell_confidence,
     )
