@@ -21,3 +21,5 @@ Alternatively, set up a shortcut on an appropriate iPhone model:
 10. Send Message => Send (Combined Text) to (some phone number)
 
 Additional things can be added, such as a Text field that stores the phone number or sending the cropped screenshot to the number as well.
+
+Link to shortcut: https://www.icloud.com/shortcuts/caa01eca1c0f435aac18af5101bbe2d8
