@@ -208,29 +208,21 @@ class GridIdentifyResponse(BaseModel):
     status: str = "ok"
 
 
-# ---- Hardcoded grid bounding box (calibrate these once for your phone/game) ----
-# These are pixel coordinates within the FULL screenshot image.
-GRID_X = 182
-GRID_Y = 1245
-GRID_WIDTH = 927
-GRID_HEIGHT = 927
-# GRID_SIZE reuses DEFAULT_SIZE (defined above near /solve) so there's one
-# single place that controls board size for the whole app.
+# The user now crops the screenshot themselves before sending it, so the
+# uploaded image IS the grid -- no bounding box needed, just split it evenly.
 GRID_SIZE = DEFAULT_SIZE
 
 
 @app.post("/identify-grid", response_model=GridIdentifyResponse)
 async def identify_grid(request: Request):
     """
-    Accepts the FULL screenshot as a multipart/form-data upload (this is what
-    Shortcuts actually sends even when "File" is picked as the body type).
-    Grabs whichever field in the form contains the uploaded file, regardless
-    of its field name. Uses the hardcoded GRID_X / GRID_Y / GRID_WIDTH /
-    GRID_HEIGHT / GRID_SIZE constants above for the bounding box -- edit
-    those directly if your board's position or size ever changes.
-    Crops out each cell server-side and reads each letter with EasyOCR.
+    Accepts a screenshot that has ALREADY been tightly cropped to just the
+    letter grid (the user does the cropping before sending). Splits the
+    image evenly into a GRID_SIZE x GRID_SIZE set of cells and reads each
+    letter with EasyOCR. Sent as multipart/form-data (this is what Shortcuts
+    actually sends even when "File" is picked as the body type).
     """
-    x, y, width, height, size = GRID_X, GRID_Y, GRID_WIDTH, GRID_HEIGHT, GRID_SIZE
+    size = GRID_SIZE
 
     # Shortcuts sends the image as multipart/form-data even when "File" is
     # selected as the body type, so we parse the form and grab whichever
@@ -265,22 +257,16 @@ async def identify_grid(request: Request):
         )
 
     img_w, img_h = full_img.size
-    if x < 0 or y < 0 or x + width > img_w or y + height > img_h:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Grid box ({x},{y},{width},{height}) falls outside image bounds ({img_w}x{img_h}).",
-        )
-
-    cell_w = width / size
-    cell_h = height / size
+    cell_w = img_w / size
+    cell_h = img_h / size
 
     letters = []
     confidences = []
 
     for row in range(size):
         for col in range(size):
-            left = x + col * cell_w
-            top = y + row * cell_h
+            left = col * cell_w
+            top = row * cell_h
             right = left + cell_w
             bottom = top + cell_h
 
