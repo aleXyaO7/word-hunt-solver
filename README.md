@@ -1,13 +1,29 @@
 Ping `https://word-hunt-solver--AlexY7.replit.app/play` with a screenshot of a Word Hunt game and receive a list of all available words that corresponds with alphaDictionary.
 
-Example curl request:
 ```
 curl -X POST https://word-hunt-solver--alexy7.replit.app/play \
   -F "file=screenshot.png"
 ```
 where screenshot.png is your screenshot file.
 
-Alternatively, set up a shortcut on an appropriate iPhone model:
+Alternatively, ping `https://word-hunt-solver--AlexY7.replit.app/solve` with a 16-letter string representation of the 4x4 board.
+
+```
+curl -X POST https://word-hunt-solver--alexy7.replit.app/solve \
+  -H "Content-Type: application/json" \
+  -d '{"letters": "ABCDEFGHIJKLMNOP"}'
+```
+which represents the board:
+```
+ABCD
+EFGH
+IJKL
+MNOP
+```
+
+To use the Shortcut: https://www.icloud.com/shortcuts/caa01eca1c0f435aac18af5101bbe2d8
+
+Or, set it up manually by adding these steps:
 
 1. Take Screenshot
 2. Crop Image => Crop screenshot tightly (only the 4x4 grid)
@@ -21,5 +37,3 @@ Alternatively, set up a shortcut on an appropriate iPhone model:
 10. Send Message => Send (Combined Text) to (some phone number)
 
 Additional things can be added, such as a Text field that stores the phone number or sending the cropped screenshot to the number as well.
-
-Link to shortcut: https://www.icloud.com/shortcuts/caa01eca1c0f435aac18af5101bbe2d8
