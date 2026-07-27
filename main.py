@@ -244,11 +244,6 @@ async def identify_grid(request: Request):
     if not contents:
         raise HTTPException(status_code=400, detail="Uploaded file was empty.")
 
-    # ---- DEBUG: save exactly what was received, for inspection ----
-    with open("debug_received.png", "wb") as f:
-        f.write(contents)
-    # -----------------------------------------------------------
-
     try:
         full_img = Image.open(io.BytesIO(contents))
     except Exception:
