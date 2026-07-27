@@ -2,9 +2,9 @@ Ping `https://word-hunt-solver--AlexY7.replit.app/play` with a screenshot of a W
 
 ```
 curl -X POST https://word-hunt-solver--alexy7.replit.app/play \
-  -F "file=screenshot.png"
+  -F "file=image.png"
 ```
-where screenshot.png is your screenshot file.
+where image.png is a tightly cropped screenshot of only the 4x4 grid.
 
 Alternatively, ping `https://word-hunt-solver--AlexY7.replit.app/solve` with a 16-letter string representation of the 4x4 board.
 
